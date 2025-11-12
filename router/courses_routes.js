@@ -1,5 +1,7 @@
 const express = require('express');
 const verifyToken = require('../middleware/verifyToken.js');
+const verifyRoles = require('../middleware/verifyRoles.js');
+const roles = require('../data/roles_data.js');
 
 const router = express.Router();
 const{
@@ -24,6 +26,6 @@ router
 .route('/:courseId')
 .get(verifyToken,getCourseById)
 .patch(verifyToken,updateCourseValidation,updateCourse)
-.delete(verifyToken,deleteCourse);
+.delete(verifyToken,verifyRoles(roles.ADMIN , roles.USER),deleteCourse);
 
 module.exports = router;

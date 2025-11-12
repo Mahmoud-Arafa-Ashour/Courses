@@ -1,7 +1,7 @@
 const User = require('../models/users.model.js');
-const httpStatusText = require('../utils/httpstatustext.js');
+const httpStatusText = require('../utils/httpStatusText.js');
 const asyncHandler = require('../middleware/asyncWrraper.js');
-const appError = require('../utils/AppError.js');
+const appError = require('../utils/appError.js');
 const { get } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const generateToken = require('../utils/generateToken.js');
@@ -28,15 +28,17 @@ const getUserById = asyncHandler(async (req,res,next) => {
 })
 
 const register = asyncHandler(async (req,res,next)=> {
-    const {firstName, lastName, email, password} = req.body;
+    const {firstName, lastName, email, password , role , Avatar} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
         firstName,
         lastName,
         email,
-        password : hashedPassword
+        password : hashedPassword,
+        role,
+        Avatar : req.file.filename
     })
-    const token = await generateToken({id: newUser._id, email: newUser.email});
+    const token = await generateToken({id: newUser._id, email: newUser.email , role: newUser.role});
     newUser.token = token;
     await newUser.save();
     res.status(201).json({status : httpStatusText.SUCCESS ,data:{newUser , token : token}});
@@ -55,7 +57,7 @@ res.status(200).json({status : httpStatusText.SUCCESS , data : null ,  message :
 })
 
 const login = asyncHandler(async (req,res,next) => {
-    const {email, password} = req.body;
+    const {email, password , role} = req.body;
     console.log("body:", req.body);
     if(!email || !password){
         const error = appError.create('email and password are required' , 400 , httpStatusText.ERROR);
@@ -71,7 +73,7 @@ const login = asyncHandler(async (req,res,next) => {
         const error = appError.create('Invalid password' , 401 , httpStatusText.ERROR);
         return next(error);
     }
-    const token = await generateToken({id: user._id, email: user.email});
+    const token = await generateToken({id: user._id, email: user.email , role: user.role});
     user.token = token;
     await user.save();
     res.status(200).json({status : httpStatusText.SUCCESS , data : {user} , message : 'Login successful' });

@@ -11,6 +11,7 @@ const{
     deleteUser,
     login
 } = require('../services/users_services.js');
+const upload = require('../utils/uploadFile.js');
 
 
 router
@@ -19,7 +20,7 @@ router
 
 router
 .route('/register')
-.post(register);
+.post( upload.uploadImage.single('Avatar'),register);
 
 router
 .route('/:userId' , verifyToken)

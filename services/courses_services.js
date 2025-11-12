@@ -1,8 +1,8 @@
 const Course = require('../models/courses.model.js');
 const { validationResult } = require('express-validator');
-const httpStatusText = require('../utils/httpstatustext.js');
+const httpStatusText = require('../utils/httpStatusText.js');
 const asyncHandler = require('../middleware/asyncWrraper.js');
-const appError = require('../utils/AppError.js');
+const appError = require('../utils/appError.js');
 
 const getAllCourses = async (req,res) => {
     const queryParams = req.query;
@@ -43,8 +43,8 @@ const updateCourse = asyncHandler(async (req,res,next) => {
 })
 
 const deleteCourse = asyncHandler(async (req,res,next) => {
-const courseId = +req.params.courseId;
-await Course.deleteone({_id: courseId});
+const courseId = req.params._id;
+await Course.deleteOne({_id: courseId});
 res.status(200).json({status : httpStatusText.SUCCESS , data : null ,  message : 'Course deleted successfully' });
 })
 
